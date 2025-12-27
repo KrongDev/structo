@@ -4,8 +4,8 @@ import com.archbuilder.auth.application.dto.AuthResult;
 import com.archbuilder.auth.application.usecase.LogoutUseCase;
 import com.archbuilder.auth.application.usecase.RefreshTokenUseCase;
 import com.archbuilder.auth.interfaces.controller.dto.RefreshTokenRequest;
+import com.archbuilder.common.dto.ApiResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,14 +20,14 @@ public class AuthController {
     private final LogoutUseCase logoutUseCase;
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResult> refresh(@RequestBody RefreshTokenRequest request) {
+    public ApiResponse<AuthResult> refresh(@RequestBody RefreshTokenRequest request) {
         AuthResult result = refreshTokenUseCase.execute(request.refreshToken());
-        return ResponseEntity.ok(result);
+        return ApiResponse.ok(result);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@AuthenticationPrincipal String userId) {
+    public ApiResponse<Void> logout(@AuthenticationPrincipal String userId) {
         logoutUseCase.execute(userId);
-        return ResponseEntity.noContent().build();
+        return ApiResponse.ok();
     }
 }
