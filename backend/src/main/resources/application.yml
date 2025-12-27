@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: architecture-builder
+  profiles:
+    active: local
+  threads:
+    virtual:
+      enabled: true
+
+  datasource:
+    url: jdbc:mysql://localhost:3307/architecture_builder?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: ${MYSQL_USER:arch_builder}
+    password: ${MYSQL_PASSWORD:db_password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+
+  data:
+    mongodb:
+      uri: mongodb://${MONGO_ROOT_USERNAME:admin}:${MONGO_ROOT_PASSWORD:mongo_password}@localhost:27017/architecture_builder?authSource=admin
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
+          github:
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
+            scope:
+              - user:email
+              - read:user
+
+jwt:
+  secret: ${JWT_SECRET:verySecretKeyForLocalDevelopmentOnly1234567890}
+  access-token-validity: 3600000 # 1 hour
+  refresh-token-validity: 604800000 # 7 days
