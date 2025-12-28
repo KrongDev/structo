@@ -49,14 +49,16 @@ public class UserEntity extends BaseEntity<User> {
     @Column(nullable = false)
     private PlanType planType = PlanType.FREE;
 
-    public UserEntity(User user) {
-        BeanUtils.copyProperties(user, this);
-    }
-
     @Override
     public User toDomain() {
         User user = new User();
         BeanUtils.copyProperties(this, user);
         return user;
+    }
+
+    public static UserEntity fromDomain(User user) {
+        UserEntity userEntity = new UserEntity();
+        BeanUtils.copyProperties(user, userEntity);
+        return userEntity;
     }
 }

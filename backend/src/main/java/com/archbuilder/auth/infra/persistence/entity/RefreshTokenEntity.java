@@ -29,14 +29,16 @@ public class RefreshTokenEntity extends BaseEntity<RefreshToken> {
     @Column(nullable = false)
     private LocalDateTime expiryDate;
 
-    public RefreshTokenEntity(RefreshToken refreshToken) {
-        BeanUtils.copyProperties(refreshToken, this);
-    }
-
     @Override
     public RefreshToken toDomain() {
         RefreshToken res = new RefreshToken();
         BeanUtils.copyProperties(this, res);
+        return res;
+    }
+
+    public static RefreshTokenEntity fromDomain(RefreshToken refreshToken) {
+        RefreshTokenEntity res = new RefreshTokenEntity();
+        BeanUtils.copyProperties(refreshToken, res);
         return res;
     }
 }
