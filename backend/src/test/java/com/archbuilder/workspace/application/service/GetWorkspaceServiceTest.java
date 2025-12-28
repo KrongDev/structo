@@ -34,10 +34,7 @@ class GetWorkspaceServiceTest {
         String workspaceId = "ws-1";
         String userId = "user-1";
 
-        Workspace workspace = Workspace.builder()
-                .id(workspaceId)
-                .userId(userId)
-                .build();
+        Workspace workspace = Workspace.of(workspaceId, userId, "workspace");
 
         given(workspaceRepository.findById(workspaceId)).willReturn(Optional.of(workspace));
 
@@ -78,8 +75,8 @@ class GetWorkspaceServiceTest {
     void findAllByUserId() {
         // given
         String userId = "user-1";
-        Workspace w1 = Workspace.builder().id("1").userId(userId).build();
-        Workspace w2 = Workspace.builder().id("2").userId(userId).build();
+        Workspace w1 = Workspace.of("1", userId, "");
+        Workspace w2 = Workspace.of("2", userId, "");
 
         given(workspaceRepository.findByUserId(userId)).willReturn(List.of(w1, w2));
 

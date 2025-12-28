@@ -30,16 +30,9 @@ class CreateWorkspaceServiceTest {
         // given
         String name = "Test Workspace";
         String userId = "user-123";
-        CreateWorkspaceCommand command = CreateWorkspaceCommand.builder()
-                .name(name)
-                .userId(userId)
-                .build();
+        CreateWorkspaceCommand command = new CreateWorkspaceCommand(userId, name);
 
-        Workspace savedWorkspace = Workspace.builder()
-                .id("ws-123")
-                .name(name)
-                .userId(userId)
-                .build();
+        Workspace savedWorkspace = Workspace.of("ws-123", userId, name);
 
         given(workspaceRepository.save(any(Workspace.class))).willReturn(savedWorkspace);
 

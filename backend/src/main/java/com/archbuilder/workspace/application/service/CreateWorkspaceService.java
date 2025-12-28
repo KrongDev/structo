@@ -17,10 +17,7 @@ public class CreateWorkspaceService implements CreateWorkspaceUseCase {
 
     @Override
     public Workspace create(CreateWorkspaceCommand command) {
-        Workspace workspace = Workspace.builder()
-                .userId(command.getUserId())
-                .name(command.getName())
-                .build();
+        Workspace workspace = Workspace.of(command.userId(), command.name());
 
         return workspaceRepository.save(workspace);
     }

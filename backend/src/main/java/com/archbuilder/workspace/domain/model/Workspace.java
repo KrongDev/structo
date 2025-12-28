@@ -1,14 +1,11 @@
 package com.archbuilder.workspace.domain.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
-@Builder
+@Builder(access= AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor
 public class Workspace {
@@ -18,6 +15,21 @@ public class Workspace {
     private String name;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public static Workspace of(String id, String userId, String name) {
+        return Workspace.builder()
+                .id(id)
+                .userId(userId)
+                .name(name)
+                .build();
+    }
+
+    public static Workspace of(String userId, String name) {
+        return Workspace.builder()
+                .userId(userId)
+                .name(name)
+                .build();
+    }
 
     public void updateName(String name) {
         this.name = name;

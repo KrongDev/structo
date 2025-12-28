@@ -1,6 +1,8 @@
 package com.archbuilder.workspace.application.service;
 
 import com.archbuilder.workspace.application.command.UpdateWorkspaceCommand;
+import com.archbuilder.workspace.domain.exception.WorkspaceAccessDeniedException;
+import com.archbuilder.workspace.domain.exception.WorkspaceNotFoundException;
 import com.archbuilder.workspace.domain.model.Workspace;
 import com.archbuilder.workspace.domain.repository.WorkspaceRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -10,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,6 +27,8 @@ class UpdateWorkspaceServiceTest {
     private UpdateWorkspaceService updateWorkspaceService;
 
     @Mock
+    private GetWorkspaceService getWorkspaceService;
+    @Mock
     private WorkspaceRepository workspaceRepository;
 
     @Test
@@ -36,13 +41,9 @@ class UpdateWorkspaceServiceTest {
 
         UpdateWorkspaceCommand command = new UpdateWorkspaceCommand(userId, workspaceId, newName);
 
-        Workspace existingWorkspace = Workspace.builder()
-                .id(workspaceId)
-                .userId(userId)
-                .name("Old Name")
-                .build();
+        Workspace existingWorkspace = Workspace.of(workspaceId, userId, "OldName");
 
-        given(workspaceRepository.findById(workspaceId)).willReturn(Optional.of(existingWorkspace));
+        given(getWorkspaceService.findById(userId, workspaceId)).willReturn(existingWorkspace);
         given(workspaceRepository.save(any(Workspace.class))).willAnswer(invocation -> invocation.getArgument(0));
 
         // when
@@ -56,12 +57,15 @@ class UpdateWorkspaceServiceTest {
     @DisplayName("should throw exception when workspace not found")
     void update_notFound() {
         // given
-        UpdateWorkspaceCommand command = new UpdateWorkspaceCommand("user-1", "ws-none", "name");
-        given(workspaceRepository.findById("ws-none")).willReturn(Optional.empty());
+        String userId = "user-1";
+        String workspaceId = "ws-none";
+        UpdateWorkspaceCommand command = new UpdateWorkspaceCommand(userId, workspaceId, "name");
+
+        given(getWorkspaceService.findById(userId, workspaceId)).willThrow(WorkspaceNotFoundException.class);
 
         // when & then
         assertThatThrownBy(() -> updateWorkspaceService.update(command))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(WorkspaceNotFoundException.class);
     }
 
     @Test
@@ -73,18 +77,13 @@ class UpdateWorkspaceServiceTest {
         String otherUser = "other-user";
 
         UpdateWorkspaceCommand command = new UpdateWorkspaceCommand(otherUser, workspaceId, "New Name");
-
-        Workspace existingWorkspace = Workspace.builder()
-                .id(workspaceId)
-                .userId(userId)
-                .name("Old Name")
-                .build();
-
-        given(workspaceRepository.findById(workspaceId)).willReturn(Optional.of(existingWorkspace));
+        // Mock 테스트를 위해 otherUser로 조회
+        given(getWorkspaceService.findById(otherUser, workspaceId))
+                .willThrow(new WorkspaceAccessDeniedException(userId, workspaceId));
 
         // when & then
         assertThatThrownBy(() -> updateWorkspaceService.update(command))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Permission denied");
+                .isInstanceOf(WorkspaceAccessDeniedException.class)
+                .hasMessageContaining(userId);
     }
 }

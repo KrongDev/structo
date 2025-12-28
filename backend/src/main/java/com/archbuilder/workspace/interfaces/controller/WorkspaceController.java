@@ -29,11 +29,7 @@ public class WorkspaceController {
     public ApiResponse<WorkspaceResponse> create(
             @AuthenticationPrincipal String userId,
             @RequestBody CreateWorkspaceRequest request) {
-        CreateWorkspaceCommand command = CreateWorkspaceCommand.builder()
-                .userId(userId)
-                .name(request.name())
-                .build();
-
+        CreateWorkspaceCommand command = new CreateWorkspaceCommand(userId, request.name());
         Workspace workspace = createWorkspaceUseCase.create(command);
         return ApiResponse.ok(WorkspaceResponse.fromDomain(workspace));
     }
